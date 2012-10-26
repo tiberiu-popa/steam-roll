@@ -24,7 +24,7 @@ void read_input(const char *filename, string &text, string &pattern)
 	f.close();
 }
 
-void write_output(const char *filename, vector<int> result)
+void write_output(const char *filename, const vector<int> &result)
 {
 	ofstream f(filename);
 
