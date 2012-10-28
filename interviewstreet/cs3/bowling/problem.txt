@@ -1,0 +1,59 @@
+The scoring rules of 10-pin bowling are as follows:
+ 
+1) A game consists of 10 frames. In each frame, the bowler has two chances to knock down as many pins as possible.
+2) For each pin knocked down, the bowler scores 1 point.
+3) If the bowler knocks off all pins with the first ball in a frame, it is called a "strike". In this case, the number of pins knocked off in the next two balls bowled is also added to the player's score for this frame.
+4) Instead, if the bowler knocks off all remaining pins with the second ball in a frame, it is called a "spare". In this case, the number of pins knocked off in the next ball bowled is also added to the player's score for this frame.
+5) If the player bowls a strike in the last frame, he is awarded two extra balls so as to allow the awarding of bonus points. If both these balls also result in strikes, a total of 30 points (10 + 10 + 10) is awarded for the frame. Similarly, if the player bowls a spare in the last frame, he is awarded one extra ball and the score for that ball is added to the score of the last frame.
+ 
+For this problem, we will consider games with N frames.
+ 
+For example, if N = 4 and the scores in the 4 frames achieved are:
+3 6 | 10 | 5 5 | 9
+The scores for each frame are 9, 10 + (5 + 5), 5 + 5 + 9, and 9 respectively. The total score is 57.
+ 
+If N = 3, and the scores in the 3 frames achieved are:
+10 | 10 | 5 5.
+In this case, since the last frame was a spare, an additional ball will be bowled. If the bowler scores say 3 on that ball, the scores for each frame are: 10 + 10 + 5, 10 + 5 + 5, 5 + 5 + 3, for a total score of 58.
+ 
+Note that the maximum score with N frames is 30 * N. This score is attained when all N frames are strikes, and the two additional balls bowled are strikes as well.
+ 
+Given N and M, you need to count how many score sequences over N frames can result in a total score of M.
+ 
+ 
+Input:
+The first line contains the number of test cases T. The next T lines contain two integers, N and M respectively.
+ 
+Output:
+Output T lines, one for each test case. Output all answers modulo 1000000007.
+ 
+Constraints:
+1 <= T <= 1000
+1 <= N <= 100
+0 <= M <= 30 * N
+ 
+ 
+Sample Input:
+5
+1 9
+1 11
+1 25
+3 90
+3 10
+ 
+Sample Output:
+10
+12
+1
+1
+3003
+ 
+ 
+Explanation:
+For the first case, there are 10 ways to score 9 in 1 frame - 0,9 or 1,8 ... or 9,0.
+ 
+For the second case, there are 10 ways to bowl a spare in the first frame and score an additional 1 point with the extra ball. It is also possible to score a strike in the first frame followed by 0,1 or 1,0 with the two extra balls. Thus there are a total of 12 ways.
+ 
+For the third case, there is only 1 way. Score a strike in the first frame, score another strike with the first extra ball, and an additional 5 with the second extra ball.
+ 
+For the fourth case, there is again only 1 way. Score a strike in all frames, as well as with the two extra balls.
