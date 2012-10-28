@@ -1,13 +1,13 @@
 #include <cstdio>
+#include <cstdlib>
 
 #define MAX_N 100
 #define MOD_PRIME 1000000007
 
 int st_x[MAX_N];
 int st_y[MAX_N];
-int n = 5;
-int m = 23;
-int soln = 0;
+int n, m;
+int soln;
 
 void increment(int &x)
 {
@@ -68,9 +68,11 @@ int main()
 {
 	int num_tests = 0;
 
-	scanf("%d", &num_tests);
+	if (scanf("%d", &num_tests) != 1)
+		exit(EXIT_FAILURE);
 	for (int i = 0; i < num_tests; i++) {
-		scanf("%d %d", &n, &m);
+		if (scanf("%d %d", &n, &m) != 2)
+			exit(EXIT_FAILURE);
 		soln = 0;
 		bkt(0, 0);
 		printf("soln=%d\n", soln);

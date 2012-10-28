@@ -9,6 +9,8 @@ build: bowling
 
 bowling: bowling.o
 
+bkt: bkt.o
+
 run:
 	@./bowling < input00.txt
 
