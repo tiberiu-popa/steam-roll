@@ -1,7 +1,3 @@
-#include <algorithm>
-#include <queue>
-#include <set>
-#include <vector>
 #include <cstdio>
 #include <cstdlib>
 
@@ -9,9 +5,6 @@
 #define MAX_M (30 * MAX_N + 1)
 #define MAX_POINTS 10
 #define MOD_NUMBER 1000000007
-
-#define dprintf(fmt, ...) ((void) 0)
-//#define dprintf printf
 
 using namespace std;
 
@@ -96,27 +89,21 @@ void run_dp(int n)
 void print_answer(int n, int m)
 {
 	int sum = dp[n - 1][m][0];
-	dprintf("sum=%d\n", sum);
+
 	for (int j = m; j >= m - MAX_POINTS && j >= 0; j--)
 		add_to_modulo(sum, dp[n - 1][j][1]);
-	dprintf("sum=%d\n", sum);
+
 	for (int j = 0; j <= m; j++) {
 		for (int p = 0; p <= MAX_POINTS; p++)
 			for (int q = 0; q <= MAX_POINTS; q++) {
 				if (p < MAX_POINTS && p + q > MAX_POINTS)
 					break;
 				int cand = j + p + q;
-				if (cand == m) {
+				if (cand == m)
 					add_to_modulo(sum, dp[n - 1][j][2]);
-					if (dp[n - 1][j][2] != 0)
-						dprintf("(A) new=%d j=%d\n", dp[n - 1][j][2], j);
-				}
 				cand = j + 2 * p + q;
-				if (cand == m) {
+				if (cand == m)
 					add_to_modulo(sum, dp[n - 1][j][3]);
-					if (dp[n - 1][j][3] != 0)
-						dprintf("(B) new=%d j=%d\n", dp[n - 1][j][3], j);
-				}
 			}
 	}
 
