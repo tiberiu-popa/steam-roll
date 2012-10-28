@@ -1,0 +1,25 @@
+Given n and r, in how many ways can r items be chosen from n items?
+ 
+Input:
+The first line contains the number of test cases T. Each of the next T lines contains two integers n and r each.
+ 
+Output:
+Output T lines, containing the required answer for the corresponding case. Output all answers modulo 142857.
+ 
+Constraints:
+1 <= T <= 100000
+1 <= n <= 1000000000
+0 <= r <= n
+ 
+Sample Input:
+4
+2 1
+4 0
+5 2
+10 3
+ 
+Sample Output:
+2
+1
+10
+120
