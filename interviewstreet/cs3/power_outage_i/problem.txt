@@ -1,0 +1,41 @@
+You are in a planning team, which is in charge of laying out an auxiliary electricity grid. The purpose of this auxiliary grid is to power the lamp posts on junctions of a small town in case of power outage. Your team is given k generators. You can place these generators anywhere in the grid and each generator can turn on all the lamps that have a connection to it via the grid (there exists a path). For each road in the town, you are given the cost of laying down a cable in the grid to connect the two junctions at the endpoints of that road. Given the layout of the town, your task is to lay down the minimum cost grid and install the generators on it such that you can turn on all the lampposts on the junctions of the town.
+
+ 
+Input:
+The first line contains the number of cases t. Then, t cases follow.
+The first line of each case  contains three integer n, m, and k. The junctions are numbered 1 to n. Then, m lines follow.
+Each line contains three integers i, j, c. The integers i and j are between 1 and n and denote the two junctions at the two endpoints of a road. The third integer, c, is the cost of laying down a cable in the grid on this road.
+ 
+Output:
+You should output t lines, one for each case. For each case output the minimum cost grid. If this 
+task is impossible (i.e. there is no way to turn all the lamps on with k generators), output 
+"Impossible!" (quotes for clarity)
+ 
+Constraints:
+1 <= t <= 25
+1 <= n <= 2000
+0 <= m <= n(n-1)/2
+0 <= c <= 1000000
+ 
+Sample Input:
+2
+3 1 1
+1 2 10
+6 7 2
+1 2 20
+1 3 5
+1 4 10
+2 3 8
+2 4 15
+3 4 2
+5 6 9
+ 
+Sample Output:
+Impossible!
+24
+ 
+Explanation:
+In the first case, the junctions 1 and 2 are disconnected from junction 3 and you cannot turn on 
+all the lampposts with only one generator. You need at least two generators.
+In the second case, you can lay down cable on the roads (1 3), (2 3), (3 4), and (5 6) and then 
+install one generator on junction 1 and one generator on junction 5.
