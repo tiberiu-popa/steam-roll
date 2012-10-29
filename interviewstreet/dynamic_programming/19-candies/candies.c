@@ -15,7 +15,7 @@ int get_direction(int x, int y)
 
 long long compute_sum(int x)
 {
-	long y = x;
+	long long y = x;
 	return y * (y + 1) / 2;
 }
 
