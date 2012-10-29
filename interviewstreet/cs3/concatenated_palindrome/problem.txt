@@ -1,0 +1,47 @@
+You are given 'n' strings w1, w2, ....., wn of equal length 'm'. You can cut each string at any of the 'm+1' points (anywhere in between or before the first character or after the last character). Hence you can cut a string wi into 2 parts wiL and wiR. You can concatenate the left part of some string 'i' wiL and the right part of some other string 'j'  wjR (i != j), to form a new string 'w' = wiL.wjR (where '.' is concatenation). Your task is to determine the longest possible length of 'w' such that 'w'is a palindrome.
+
+
+
+Input:
+
+The first line of input contains 2 space separated integers 'n' and 'm'. Each of the next 'n' lines contains a string wi of length 'm'.
+
+
+
+Output:
+
+Output a single line containing an integer which denotes the maximum length of the palindrome.
+
+
+
+Constraints:
+
+1<n<=100
+
+1<=m<=100000
+
+All strings are case sensitive, and only contain characters 'a'-'z', 'A'-'Z' and '0'-'9'.
+
+
+
+Sample Input:
+
+3 5
+
+abcvg
+
+hycaf
+
+xbbba
+
+
+
+Sample Output:
+
+6
+
+
+
+Explanation:
+
+The first string can be split into "ab", "cvg" and the last string can be split into "x", "bbba". "ab" and "bbba" can be concatenated to get a string "abbbba", which is a palindrome of length 6.
