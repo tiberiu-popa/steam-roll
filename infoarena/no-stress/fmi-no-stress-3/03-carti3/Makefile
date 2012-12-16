@@ -7,7 +7,7 @@ all: build
 
 build: carti3
 
-ternar: carti3.o
+carti3: carti3.o
 
 run: carti3
 	@./carti3

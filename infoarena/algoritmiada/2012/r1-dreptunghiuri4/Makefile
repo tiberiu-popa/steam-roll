@@ -7,7 +7,7 @@ all: build
 
 build: dreptunghiuri4
 
-ternar: dreptunghiuri4.o
+dreptunghiuri4: dreptunghiuri4.o
 
 run: dreptunghiuri4
 	@./dreptunghiuri4
