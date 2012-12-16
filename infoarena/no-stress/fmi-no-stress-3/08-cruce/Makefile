@@ -7,7 +7,7 @@ all: build
 
 build: cruce
 
-ternar: cruce.o
+cruce: cruce.o
 
 run: cruce
 	@./cruce

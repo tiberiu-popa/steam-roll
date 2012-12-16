@@ -7,7 +7,7 @@ all: build
 
 build: shift
 
-ternar: shift.o
+shift: shift.o
 
 run: shift
 	@./shift

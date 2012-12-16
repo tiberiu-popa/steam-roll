@@ -7,7 +7,7 @@ all: build
 
 build: drum4
 
-ternar: drum4.o
+drum4: drum4.o
 
 run: drum4
 	@./drum4
