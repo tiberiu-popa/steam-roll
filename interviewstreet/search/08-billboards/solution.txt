@@ -1,0 +1,19 @@
+Let v be the vector of billboards and u be the vector of partial sums:
+	u[i] = v[0] + ... + v[i].
+
+Let r[i] = the optimal configuration of billboards in [0, i) (take r[0] = 0).
+Then, the following recurrence holds:
+	r[i] = max(r[i - 1],
+			r[i - 2] + v[i - 1],
+			r[i - 3] + v[i - 2] + v[i - 1],
+			...,
+			r[i - k - 1] + v[i - k] + v[i - k + 1] + ... + v[i - 1]).
+
+If we let dp[i] = r[i] - u[i - 1], then
+	dp[i] = max(r[i - 1] - u[i - 1],
+			r[i - 2] - u[i - 2],
+			...,
+			r[i - k - 1] - u[i - k - 1])
+		= max(dp[i - 1], dp[i - 2], ..., dp[i - k - 1]).
+
+The latter recurrence can be solved with either a tree set or, even better, a deque.
