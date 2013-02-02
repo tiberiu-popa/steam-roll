@@ -1,0 +1,10 @@
+First of all, build a directed graph based on the requirements.
+Then, do a DFS to find eventual cycles and note that
+	x[0] <= ... <= x[k] <= x[0]
+actually implies equality. Thus, one can remove all but one node from a cycle.
+Now consider all subsets S of nodes that satisfy the following property:
+	for all x in S, if there is a requirement that y <= x, then y in S.
+The inclusion relation induces a directed graph on the subsets.
+If we denote the number of possibilities of assigning at most j values to
+variables from subset S by dp[S][j], then we get a simple recurrence:
+	dp[S][j] = sum_{T s.t. T strictly included in S} dp[T][j - 1].
