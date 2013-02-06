@@ -1,0 +1,77 @@
+The qualification round is over, and 10169 hackers solved at least one problem. The most exciting things to watch in this round was who finished first, and who would get the last passing submission. There was only one person with a total penalty of less than an hour, which made Mark the clear winner. A few people were playing a game of chicken to see who would get the last submission. The winner of this game submitted his solution to Beautiful Strings with only 4 seconds left in the round, to claim the honor of finishing last among all qualifiers. Congratulations to Ryan for this accomplishment! Reminder: the strategy of finishing last might not work as well for future rounds...
+
+
+Beautiful Strings
+This was the easiest problem in the round. It was attempted by 10697 contestants, and solved by 9865. The main idea is to count the frequency of each letter, then assign the value 26 to the most frequent letter, 25 to the next, etc. If two letters are tied for most frequent, it doesn't matter which of them gets which value, since the sum will be the same. The python code below explains the solution pretty well.
+
+
+from collections import Counter
+
+def get_beauty(string):
+    string = string.lower()
+
+    # Remove all characters other than letters
+    string = ''.join(x for x in string if 'a' <= x <= 'z' )
+
+    # Make a dictionary where the keys are letters and the values are counts
+    freq = Counter(string)
+
+
+    # Get the values (letter counts) and sort them in descending order
+    arr = freq.values()
+    arr.sort()
+    arr.reverse()
+
+    # 26 * (count of most common letter) + (25 * next most common) + ...
+    values_and_counts = zip(range(26, 0, -1), arr)
+    return sum(value * count for value, count in values_and_counts)
+
+Balanced Smileys
+This problem was attempted by 7096 contestants, but only 2860 solved it. There are a lot of ways to solve this problem. You could go for the brute force solution, which was O(2^N), a dynamic programming/memoization approach, which would be O(N^2)/O(N^3), or the solution intended by the writer, which was O(N). We decided to let everyone who made a correct solution pass, so any of the above actually passes our tests. The number of passing submissions for this problem is just what we wanted from the qualification round, so we think it was a good call. This post will only cover the O(N) solution.
+
+
+The idea is to keep track of the possible range of open parentheses.
+We use two values, 'minOpen' and 'maxOpen'. Initialize both of these to 0.
+Iterate over the message, character by character.
+Whenever you encounter a '(', you increment maxOpen, and if it wasn't part of a smiley, you also increment minOpen.
+Whenever you encounter a ')', you decrement minOpen, and if it wasn't part of a frowny face, decrement maxOpen. If minOpen is negative, reset it to 0.
+
+
+If maxOpen ever was negative, or minOpen isn't 0, it wasn't possible that the message had balanced parentheses. Otherwise it was possible. Python code that solves this problem is below.
+
+def isBalanced(message):
+    minOpen = 0
+    maxOpen = 0
+
+    for i in xrange(len(message)):
+        if message[i] == '(':
+            maxOpen += 1
+            if i != 0 and message[i-1] != ':':
+                minOpen += 1
+        elif message[i] == ')':
+            minOpen = max(0, minOpen-1)
+            if i != 0 and message[i-1] != ':':
+                maxOpen -= 1
+                if maxOpen < 0:
+                    break
+
+    if maxOpen >= 0 and minOpen == 0:
+        return "YES"
+    else:
+        return "NO"
+
+
+Find the Min
+This problem was attempted by 2555 contestants, and solved by 1929, making it the hardest problem in this round. The most challenging part of this problem is the large n. To solve this problem, you should notice 2 things:
+The maximum result of m[i] (i >= k) will not be larger than k+1, so even though m[i] (i < k) may be as large as 10^9, the solution is never larger than k + 1
+The result of m will be repeated every k+1 numbers. This means that we just have to calculate the k+1 next numbers, even if n is very large.
+Now we've reduced the problem to the following: find m[k], m[k+1], ..., m[2k+1]. The brute force version of doing this is still too slow (O(k^2)), so we have to use a BST (set/map in C++) to maintain the 'available' values, i.e the values not include in previous k elements. This reduces the time complexity to O(k log k), which should run well within the 6 minutes. For a clean implementation of this idea, take a look at the solution of Mark in first place.
+
+Take a look at people's solutions from https://www.facebook.com/hackercup/scoreboard?round=185564241586420 to get some more pointers on how to solve the problems.
+
+Good luck to everyone that qualified to Round 1!
+
+Writers:
+Beautiful Strings: David Alves
+Balanced Smileys: Torbjørn Morland
+Find the Min: ZiHing Cheung
