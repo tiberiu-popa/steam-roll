@@ -5,12 +5,12 @@ CXXFLAGS=-Wall -Wextra -Wsign-conversion -O2
 
 all: build
 
-build: rama
+build: alianta
 
-rama: rama.o
+alianta: alianta.o
 
-run: rama
-	@./rama
+run: alianta
+	@./alianta
 
 clean:
-	rm -rf *.o *~ *.out rama
+	rm -rf *.o *~ *.out alianta

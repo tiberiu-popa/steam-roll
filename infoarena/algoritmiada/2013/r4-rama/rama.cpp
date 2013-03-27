@@ -4,7 +4,6 @@
 
 #define MAX_N 700
 #define MAX_M 700
-#define MAX_LOG_M 11
 
 using namespace std;
 
