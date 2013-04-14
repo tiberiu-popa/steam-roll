@@ -1,5 +1,4 @@
 from __future__ import print_function
-import math
 
 max_length = 50
 
@@ -28,7 +27,7 @@ sum_full_table = map(sum, full_table)
 accum_table = [ ]
 for i in xrange(len(full_table)):
 	if i < 2:
-		accum_table.append(full_table[i])
+		accum_table.append([ 1 if j == 0 else x for j, x in enumerate(full_table[i]) ])
 	else:
 		accum_table.append(map(lambda (x, y): x + y, zip(accum_table[i - 2], full_table[i])))
 sum_accum_table = map(sum, accum_table)
