@@ -12,7 +12,6 @@
 using namespace std;
 
 int grid[MAX_N][MAX_M];
-int right[MAX_N][MAX_M + 1];
 int dp[MAX_N][MAX_M][MAX_M + 1][2];
 int comb[MAX_N][MAX_M + 1];
 int ans[MAX_N][MAX_X + 2];
@@ -20,7 +19,7 @@ int ans[MAX_N][MAX_X + 2];
 void solve_problem()
 {
 	int n, m, x;
-	char str[MAX_M + 3];
+	char str[2 * MAX_M + 3];
 
 	fgets(str, sizeof(str), stdin);
 	char *p = strtok(str, " ");
@@ -36,19 +35,6 @@ void solve_problem()
 			grid[i][j] = (str[2 * j] == 'C');
 	}
 
-	for (int i = 0; i < n; i++) {
-		right[i][0] = 0;
-		for (int j = 0; j < m; j++)
-			right[i][j + 1] = grid[i][j] + right[i][j];
-	}
-#if 0
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j <= m; j++)
-			printf("%d ", right[i][j]);
-		printf("\n");
-	}
-	printf("\n");
-#endif
 	for (int i = 0; i < n; i++) {
 		for (int k = 1; k <= m; k++) {
 			dp[i][0][k][grid[i][0]] = 1;
@@ -82,21 +68,7 @@ void solve_problem()
 					ans[i][k + l] = cand;
 			}
 	}
-#if 0
-	for (int i = 0; i < n; i++) {
-		for (int k = 0; k <= m; k++)
-			printf("%d ", comb[i][k]);
-		printf("\n");
-	}
-	printf("\n");
 
-	for (int i = 0; i < n; i++) {
-		for (int k = 0; k <= x; k++)
-			printf("%d ", ans[i][k]);
-		printf("\n");
-	}
-	printf("\n");
-#endif
 	printf("%d\n", ans[n - 1][x]);
 }
 
