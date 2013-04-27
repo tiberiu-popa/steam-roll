@@ -65,7 +65,7 @@ int main()
 		return 1;
 	}
 	if (freopen("lawnmower.out", "wt", stdout) == NULL) {
-		fprintf(stderr, "Could not reopen stdin\n");
+		fprintf(stderr, "Could not reopen stdout\n");
 		return 1;
 	}
 
