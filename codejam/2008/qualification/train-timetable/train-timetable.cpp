@@ -93,8 +93,8 @@ int solve_problem(int num_case)
 	sort(timetable, timetable + na + nb);
 	for (int i = 0; i < na + nb; i++) {
 		int dir = timetable[i].first.direction;
-		set<train_time>::iterator u_it = trains.upper_bound(timetable[i].first);
-		for (set<train_time>::iterator it = trains.begin(); it != u_it; ++it) {
+		multiset<train_time>::iterator u_it = trains.upper_bound(timetable[i].first);
+		for (multiset<train_time>::iterator it = trains.begin(); it != u_it; ++it) {
 			trains.erase(it);
 			waiting[it->direction ^ 1]++;
 		}
