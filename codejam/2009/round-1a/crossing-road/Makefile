@@ -1,6 +1,6 @@
 CC=g++
 CXX=g++
-CXXFLAGS=-std=c++0x -Wall -Wextra -Wsign-conversion -g#O2
+CXXFLAGS=-std=c++0x -Wall -Wextra -Wsign-conversion -O2
 .PHONY : clean
 
 all: build
