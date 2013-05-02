@@ -23,26 +23,23 @@ int solve_problem(int num_case)
 			return 1;
 
 	for (int j = 0; j < NUM_PIXELS; j++)
-		dp[0][j] = abs(a[0] - j);
+		dp[0][j] = min(abs(a[0] - j), del_cost);
 
 	for (int i = 1; i < n; i++) {
 		for (int j = 0; j < NUM_PIXELS; j++)
-			dp[i][j] = i * del_cost + min(abs(a[i] - j), del_cost);
+			dp[i][j] = dp[i - 1][j] + del_cost;
 		for (int j = 0; j < NUM_PIXELS; j++) {
-			int cand = dp[i - 1][j] + del_cost;
-			if (cand < dp[i][j])
-				dp[i][j] = cand;
 			if (m > 0) {
 				for (int k = 0; k < NUM_PIXELS; k++) {
 					int num_inserts = 0;
 					if (k != j)
 						num_inserts = (abs(k - j) - 1) / m;
-					cand = dp[i - 1][j] + abs(a[i] - k) + num_inserts * ins_cost;
+					int cand = dp[i - 1][j] + abs(a[i] - k) + num_inserts * ins_cost;
 					if (cand < dp[i][k])
 						dp[i][k] = cand;
 				}
 			} else {
-				cand = dp[i - 1][j] + abs(a[i] - j);
+				int cand = dp[i - 1][j] + abs(a[i] - j);
 				if (cand < dp[i][j])
 					dp[i][j] = cand;
 			}
