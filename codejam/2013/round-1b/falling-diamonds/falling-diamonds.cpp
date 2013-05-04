@@ -26,13 +26,6 @@ void build_p()
 		for (int j = 1 ; j <= i; j++)
 			sp[i][j] = sp[i][j - 1] + p[i][j];
 	}
-#if 0
-	for (int i = 0; i <= 10; i++) {
-		for (int j = 0 ; j <= i; j++)
-			printf(" %lf", sp[i][j]);
-		printf("\n");
-	}
-#endif
 }
 
 int solve_problem(int num_case)
@@ -58,7 +51,6 @@ int solve_problem(int num_case)
 			} else {
 				int rem = table[pos] - n;
 				int num_elems = 4 * pos + 1 - rem;
-				//printf("n_e=%d y'=%d\n", num_elems, y + 1);
 				if (y + 1 <= num_elems) {
 					int idx = num_elems - (y + 1);
 					if (num_elems >= 2 * pos) {
@@ -104,11 +96,7 @@ int main(int argc, char *argv[])
 	table[0] = 1;
 	for (int i = 1; i < TABLE_SIZE; i++)
 		table[i] = table[i - 1] + 2 * (2 * i) + 1;
-#if 0
-	for (int i = 0; i < TABLE_SIZE; i++)
-		printf(" %d", table[i]);
-	printf("\n");
-#endif
+
 	if (scanf("%d", &num_tests) != 1)
 		return 1;
 	for (int i = 0; i < num_tests; i++)
