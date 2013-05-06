@@ -490,18 +490,13 @@ int solve_problem()
 					size_t right = chain_position[y];
 					if (left < right) {
 						tree_node cand_node = query_full_tree(tree[y_chain], left, right - 1);
-						cand_node = left_node.combine(cand_node);
-						reflect_node(right_node);
-						combine_nodes(best_node, cand_node, right_node);
-					} else if (left == right) {
-						reflect_node(right_node);
-						combine_nodes(best_node, left_node, right_node);
-					} else {
+						left_node = left_node.combine(cand_node);
+					} else if (left > right) {
 						tree_node cand_node = query_full_tree(tree[y_chain], right, left - 1);
-						cand_node = right_node.combine(cand_node);
-						reflect_node(left_node);
-						combine_nodes(best_node, cand_node, left_node);
+						right_node = right_node.combine(cand_node);
 					}
+					reflect_node(right_node);
+					combine_nodes(best_node, left_node, right_node);
 					break;
 				} else {
 					if (level[px] <= level[py]) {
