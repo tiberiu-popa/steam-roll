@@ -495,8 +495,6 @@ int solve_problem()
 						tree_node cand_node = query_full_tree(tree[y_chain], right, left - 1);
 						right_node = right_node.combine(cand_node);
 					}
-					reflect_node(right_node);
-					combine_nodes(best_node, left_node, right_node);
 					break;
 				} else {
 					if (level[px] <= level[py]) {
@@ -528,16 +526,14 @@ int solve_problem()
 					if (2 * (qy - qx) < cycle.size()) {
 						cand_node = query_full_tree(tree[num_chains], qx, qy - 1);
 					} else {
-						tree_node last_node = query_full_tree(tree[num_chains], qy, tree[num_chains].size() - 1);
-						tree_node first_node;
-						if (qx > 0)
-							first_node = query_full_tree(tree[num_chains], 0, qx - 1);
-						cand_node = last_node.combine(first_node);
+						cand_node = query_full_tree(tree[num_chains], qy, tree[num_chains].size() - 1);
+						if (qx > 0) {
+							tree_node first_node = query_full_tree(tree[num_chains], 0, qx - 1);
+							cand_node = cand_node.combine(first_node);
+						}
 						reflect_node(cand_node);
 					}
-					cand_node = left_node.combine(cand_node);
-					reflect_node(right_node);
-					combine_nodes(best_node, cand_node, right_node);
+					left_node = left_node.combine(cand_node);
 				} else {
 					if (2 * (qx - qy) < cycle.size()) {
 						cand_node = query_full_tree(tree[num_chains], qy, qx - 1);
@@ -549,11 +545,11 @@ int solve_problem()
 						cand_node = last_node.combine(first_node);
 						reflect_node(cand_node);
 					}
-					cand_node = right_node.combine(cand_node);
-					reflect_node(left_node);
-					combine_nodes(best_node, cand_node, left_node);
+					right_node = right_node.combine(cand_node);
 				}
 			}
+			reflect_node(right_node);
+			combine_nodes(best_node, left_node, right_node);
 			printf("%d\n", best_node.best_sum[0]);
 		}
 	}
