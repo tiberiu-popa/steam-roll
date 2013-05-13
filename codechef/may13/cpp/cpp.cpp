@@ -25,13 +25,9 @@ token_type symbols[FORMAT_SIZE];
 size_t position;
 bool invalid_syntax;
 
-struct simple_node {
+struct parser_node {
 
-	virtual ~simple_node() { }
-
-};
-
-struct parser_node : public simple_node {
+	virtual ~parser_node() { }
 
 	virtual void build_regex_string(ostringstream &os) const = 0;
 
@@ -121,7 +117,7 @@ struct repeatable_node : public parser_node {
 
 };
 
-struct quantifier_node : public simple_node {
+struct quantifier_node {
 
 	bool optional;
 	int times;
