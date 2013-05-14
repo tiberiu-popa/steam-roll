@@ -1,18 +1,38 @@
 #include <algorithm>
+#include <limits>
+#include <stack>
 #include <string>
-#include <sstream>
 #include <vector>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <regex.h>
 
 #define FORMAT_SIZE 1000
 #define BUFFER_SIZE 2000
+#define NUM_STATES (1 << 13)
 
 enum token_type {
 	ID, TO, OR, OPTIONAL, TIMES, DIGIT, LETTER, EXACTLY,
 	UPTO, LETTERS, DIGITS, LPAR, RPAR, INVALID,
+};
+
+enum regop_type {
+	REGOP_AND, REGOP_OR, REGOP_OPTIONAL, REGOP_UPPER,
+	REGOP_DIGIT, REGOP_CHAR, REGOP_RANGE, REGOP_MATCH,
+};
+
+struct regex_op {
+
+	regex_op(regop_type rt) : rt(rt), inf_ch(0), sup_ch(0) { }
+
+	regex_op(regop_type rt, char ch) : rt(rt), inf_ch(ch), sup_ch(0) { }
+
+	regex_op(regop_type rt, char inf_ch, char sup_ch)
+		: rt(rt), inf_ch(inf_ch), sup_ch(sup_ch) { }
+
+	regop_type rt;
+	char inf_ch, sup_ch;
+
 };
 
 using namespace std;
@@ -25,11 +45,54 @@ token_type symbols[FORMAT_SIZE];
 size_t position;
 bool invalid_syntax;
 
+template <class T>
+struct sparse_set {
+
+	vector<T> elements;
+	size_t positions[NUM_STATES];
+
+	bool contains(T elem) const
+	{
+		if (elem >= NUM_STATES) {
+			fprintf(stderr, "Not enough states available\n");
+			exit(EXIT_FAILURE);
+		}
+		size_t pos = positions[elem];
+		return (pos < elements.size() && elements[pos] == elem);
+	}
+
+	bool insert(T elem)
+	{
+		bool res = !contains(elem);
+		if (res) {
+			positions[elem] = elements.size();
+			elements.push_back(elem);
+		}
+		return res;
+	}
+
+	typename vector<T>::size_type size() const
+	{
+		return elements.size();
+	}
+
+	bool empty() const
+	{
+		return elements.empty();
+	}
+
+	void clear()
+	{
+		elements.clear();
+	}
+
+};
+
 struct parser_node {
 
 	virtual ~parser_node() { }
 
-	virtual void build_regex_string(ostringstream &os) const = 0;
+	virtual void build_regex_ops(vector<regex_op> &ops) const = 0;
 
 	virtual size_t compute_longest_match() const = 0;
 
@@ -54,33 +117,44 @@ struct repeatable_node : public parser_node {
 		}
 	}
 
-	virtual void build_regex_string(ostringstream &os) const
+	virtual void build_regex_ops(vector<regex_op> &ops) const
 	{
 		if (tt == ID) {
 			if (other_id.empty()) {
-				os << id;
+				for (size_t i = 0; i < id.size(); i++) {
+					ops.push_back(regex_op(REGOP_CHAR, id[i]));
+					if (i > 0)
+						ops.push_back(regex_op(REGOP_AND));
+				}
 			} else {
-				os << '[' << id << '-' << other_id << ']';
+				ops.push_back(regex_op(REGOP_RANGE, id[0], other_id[0]));
 			}
 		} else if (tt == LPAR) {
-			os << '(';
-			for (size_t i = 0; i < sub_expressions.size(); i++)
-				sub_expressions[i]->build_regex_string(os);
-			os << ')';
+			for (size_t i = 0; i < sub_expressions.size(); i++) {
+				sub_expressions[i]->build_regex_ops(ops);
+				if (i > 0)
+					ops.push_back(regex_op(REGOP_AND));
+			}
 		} else if (tt == UPTO) {
-			const char *s = is_alpha ? "[[:upper:]]" : "[[:digit:]]";
-			if (repetitions > 0)
-				os << s << "{0," << repetitions << '}';
+			regop_type rt = is_alpha ? REGOP_UPPER : REGOP_DIGIT;
+			for (int i = 0; i < repetitions; i++)
+				ops.push_back(regex_op(rt));
+			for (int i = 0; i < repetitions; i++) {
+				if (i > 0)
+					ops.push_back(regex_op(REGOP_AND));
+				ops.push_back(regex_op(REGOP_OPTIONAL));
+			}
 		} else if (tt == EXACTLY) {
-			const char *s = is_alpha ? "[[:upper:]]" : "[[:digit:]]";
-			if (repetitions > 0)
-				os << s << '{' << repetitions << '}';
+			regop_type rt = is_alpha ? REGOP_UPPER : REGOP_DIGIT;
+			for (int i = 0; i < repetitions; i++) {
+				ops.push_back(regex_op(rt));
+				if (i > 0)
+					ops.push_back(regex_op(REGOP_AND));
+			}
 		} else if (tt == LETTER) {
-			const char *s = "[[:upper:]]";
-			os << s;
+			ops.push_back(regex_op(REGOP_UPPER));
 		} else if (tt == DIGIT) {
-			const char *s = "[[:digit:]]";
-			os << s;
+			ops.push_back(regex_op(REGOP_DIGIT));
 		}
 	}
 
@@ -141,7 +215,7 @@ struct factor_node : public parser_node {
 		delete sub_factor;
 	}
 
-	virtual void build_regex_string(ostringstream &os) const
+	virtual void build_regex_ops(vector<regex_op> &ops) const
 	{
 		bool optional = false;
 		int times = 0;
@@ -149,15 +223,18 @@ struct factor_node : public parser_node {
 			optional = quantifiers.front()->optional;
 			times = quantifiers.front()->times;
 		}
-		if (optional || times > 0)
-			os << '(';
-		sub_factor->build_regex_string(os);
-		if (optional || times > 0)
-			os << ')';
-		if (optional)
-			os << '?';
-		if (times > 0)
-			os << '{' << times << '}';
+		if (optional) {
+			sub_factor->build_regex_ops(ops);
+			ops.push_back(regex_op(REGOP_OPTIONAL));
+		} else {
+			if (times < 1)
+				times = 1;
+			for (int i = 0; i < times; i++) {
+				sub_factor->build_regex_ops(ops);
+				if (i > 0)
+					ops.push_back(regex_op(REGOP_AND));
+			}
+		}
 	}
 
 	virtual size_t compute_longest_match() const
@@ -185,19 +262,12 @@ struct term_node : public parser_node {
 		}
 	}
 
-	virtual void build_regex_string(ostringstream &os) const
+	virtual void build_regex_ops(vector<regex_op> &ops) const
 	{
-		if (or_factors.size() <= 1) {
-			for (size_t i = 0; i < or_factors.size(); i++)
-				or_factors[i]->build_regex_string(os);
-		} else {
-			os << '(';
-			for (size_t i = 0; i < or_factors.size(); i++) {
-				if (i > 0)
-					os << '|';
-				or_factors[i]->build_regex_string(os);
-			}
-			os << ')';
+		for (size_t i = 0; i < or_factors.size(); i++) {
+			or_factors[i]->build_regex_ops(ops);
+			if (i > 0)
+				ops.push_back(regop_type(REGOP_OR));
 		}
 	}
 
@@ -226,10 +296,13 @@ struct expr_node : public parser_node {
 		}
 	}
 
-	virtual void build_regex_string(ostringstream &os) const
+	virtual void build_regex_ops(vector<regex_op> &ops) const
 	{
-		for (size_t i = 0; i < terms.size(); i++)
-			terms[i]->build_regex_string(os);
+		for (size_t i = 0; i < terms.size(); i++) {
+			terms[i]->build_regex_ops(ops);
+			if (i > 0)
+				ops.push_back(regop_type(REGOP_AND));
+		}
 	}
 
 	virtual size_t compute_longest_match() const
@@ -245,6 +318,250 @@ struct expr_node : public parser_node {
 	}
 
 };
+
+struct state {
+
+	regex_op rop;
+	size_t next[2];
+
+	state(regex_op rop, size_t next, size_t dangling) : rop(rop)
+	{
+		this->next[0] = next;
+		this->next[1] = dangling;
+	}
+
+	state(regex_op rop, size_t dangling) : rop(rop)
+	{
+		this->next[0] = numeric_limits<size_t>::max();
+		this->next[1] = dangling;
+	}
+
+	state(regex_op rop) : rop(rop)
+	{
+		for (int i = 0; i < 2; i++)
+			this->next[i] = numeric_limits<size_t>::max();
+	}
+
+};
+
+struct compiled_regex {
+
+	vector<state> states;
+	size_t start_index;
+
+	compiled_regex() : start_index(0) { }
+
+};
+/*
+void regex_postfix(vector<char> &q, const char *str)
+{
+	stack<char> operators;
+	size_t len = strlen(str);
+
+	for (size_t i = 0; i < len; i++) {
+		char ch = str[i];
+		if (isalnum((unsigned char) ch) || ch == '-') {
+			q.push_back(ch);
+		} else if (ch == '?') {
+			q.push_back(ch);
+			while (i + 1 < len && str[i + 1] == '?')
+				i++;
+			while (!operators.empty() && (operators.top() == '?' || operators.top() == '.')) {
+				q.push_back(operators.top());
+				operators.pop();
+			}
+		} else if (ch == '|') {
+			while (!operators.empty()) {
+				char next_ch = operators.top();
+				if (next_ch != '?' && next_ch != '.' && next_ch != '|')
+					break;
+				q.push_back(next_ch);
+				operators.pop();
+			}
+			operators.push(ch);
+		} else if (ch == '(') {
+			operators.push(ch);
+		} else if (ch == ')') {
+			while (!operators.empty()) {
+				char next_ch = operators.top();
+				operators.pop();
+				if (next_ch != '(')
+					q.push_back(next_ch);
+				else
+					break;
+			}
+		}
+		if (str[i] != '(' && str[i] != '|' && i + 1 < len) {
+			if (str[i + 1] != ')' && str[i + 1] != '?' && str[i + 1] != '|') {
+				operators.push('.');
+			}
+		}
+	}
+
+	while (!operators.empty()) {
+		q.push_back(operators.top());
+		operators.pop();
+	}
+}
+*/
+void redirect_dangling(vector<state> &states, size_t p, size_t next)
+{
+	while (p != numeric_limits<size_t>::max()) {
+		size_t next_p = states[p].next[1];
+		states[p].next[1] = next;
+		p = next_p;
+	}
+}
+
+void add_epsilon_states(sparse_set<size_t> &next_set, const vector<state> &states, size_t index)
+{
+	regop_type rt = states[index].rop.rt;
+	next_set.insert(index);
+	if (rt == REGOP_OR || rt == REGOP_OPTIONAL) {
+		for (int i = 0; i < 2; i++) {
+			size_t next_index = states[index].next[i];
+			if (next_index != numeric_limits<size_t>::max() && !next_set.contains(next_index))
+				add_epsilon_states(next_set, states, next_index);
+		}
+	}
+}
+
+size_t compile_regex(vector<state> &states, const vector<regex_op> &ops)
+{
+	stack< pair<size_t, size_t> > state_stack;
+
+	for (vector<regex_op>::const_iterator it = ops.begin(); it != ops.end(); ++it) {
+		switch (it->rt) {
+		case REGOP_AND: {
+			pair<size_t, size_t> snd = state_stack.top();
+			state_stack.pop();
+			pair<size_t, size_t> fst = state_stack.top();
+			state_stack.pop();
+			redirect_dangling(states, fst.second, snd.first);
+			state_stack.push(pair<size_t, size_t>(fst.first, snd.second));
+			break;
+		}
+
+		case REGOP_OR: {
+			pair<size_t, size_t> snd_entry = state_stack.top();
+			state_stack.pop();
+			pair<size_t, size_t> fst_entry = state_stack.top();
+			state_stack.pop();
+			size_t index = states.size();
+			state_stack.push(pair<size_t, size_t>(index, fst_entry.second));
+			states.push_back(state(*it, fst_entry.first, snd_entry.first));
+			size_t p = fst_entry.second;
+			while (states[p].next[1] != numeric_limits<size_t>::max()) {
+				p = states[p].next[1];
+			}
+			states[p].next[1] = snd_entry.second;
+			break;
+		}
+
+		case REGOP_OPTIONAL: {
+			pair<size_t, size_t> entry = state_stack.top();
+			state_stack.pop();
+			size_t index = states.size();
+			state_stack.push(pair<size_t, size_t>(index, entry.second));
+			states.push_back(state(*it, entry.first, numeric_limits<size_t>::max()));
+			size_t p = entry.second;
+			while (states[p].next[1] != numeric_limits<size_t>::max()) {
+				p = states[p].next[1];
+			}
+			states[p].next[1] = index;
+			break;
+		}
+
+		case REGOP_UPPER:
+		case REGOP_DIGIT:
+		case REGOP_CHAR:
+		case REGOP_RANGE: {
+			size_t index = states.size();
+			states.push_back(state(*it));
+			state_stack.push(pair<size_t, size_t>(index, index));
+			break;
+		}
+
+		default:
+			break;
+		}
+	}
+
+	size_t start_index = numeric_limits<size_t>::max();
+	size_t match_index = states.size();
+	states.push_back(state(regex_op(REGOP_MATCH)));
+	while (!state_stack.empty()) {
+		pair<size_t, size_t> entry = state_stack.top();
+		state_stack.pop();
+		start_index = entry.first;
+		redirect_dangling(states, entry.second, match_index);
+	}
+
+	return start_index;
+}
+
+void build_compiled_regex(compiled_regex &cr, const vector<regex_op> &ops)
+{
+	cr.start_index = compile_regex(cr.states, ops);
+}
+
+bool matches_simple_regex(const regex_op &rop, int ch)
+{
+	switch (rop.rt) {
+	case REGOP_UPPER:
+		return isupper(ch);
+
+	case REGOP_DIGIT:
+		return isdigit(ch);
+
+	case REGOP_CHAR:
+		return ch == rop.inf_ch;
+
+	case REGOP_RANGE:
+		return ch >= rop.inf_ch && ch <= rop.sup_ch;
+
+	default:
+		return false;
+	}
+}
+
+sparse_set<size_t> state_sets[2];
+
+bool matches_regex(compiled_regex &cr, const char *mstr)
+{
+	sparse_set<size_t> *prev_set = &state_sets[0];
+	sparse_set<size_t> *next_set = &state_sets[1];
+	size_t len = strlen(mstr);
+
+	prev_set->clear();
+	next_set->clear();
+	add_epsilon_states(*next_set, cr.states, cr.start_index);
+	for (size_t i = 0; i < len; i++) {
+		swap(prev_set, next_set);
+		if (prev_set->empty())
+			return false;
+		int ch = (unsigned char) mstr[i];
+		next_set->clear();
+		for (size_t i = 0; i < prev_set->size(); i++) {
+			size_t index = prev_set->elements[i];
+			const regex_op &rop = cr.states[index].rop;
+			if (matches_simple_regex(rop, ch)) {
+				for (int j = 0; j < 2; j++) {
+					size_t next_index = cr.states[index].next[j];
+					if (next_index != numeric_limits<size_t>::max() && !next_set->contains(next_index)) {
+						add_epsilon_states(*next_set, cr.states, next_index);
+					}
+				}
+			}
+		}
+	}
+
+	for (size_t i = 0; i < next_set->size(); i++)
+		if (cr.states[next_set->elements[i]].rop.rt == REGOP_MATCH)
+			return true;
+
+	return false;
+}
 
 long parse_count()
 {
@@ -577,29 +894,22 @@ int solve_problem()
 		else if (invalid_semantics)
 			printf("Matches too long ID\n");
 	} else {
-		ostringstream os;
-		regex_t regex;
+		vector<regex_op> ops;
+		compiled_regex cr;
 
-		os << '^';
-		root->build_regex_string(os);
-		os << '$';
-		string regex_str = os.str();
+		root->build_regex_ops(ops);
+		build_compiled_regex(cr, ops);
 
-		if (regcomp(&regex, regex_str.c_str(), REG_EXTENDED) != 0) {
-			fprintf(stderr, "Could not compile regex\n");
-			exit(EXIT_FAILURE);
-		}
 		for (int i = 0; i < q; i++) {
 			if (fgets(str, sizeof(str), stdin) == NULL)
 				return 1;
 			p = trim_line(str);
-			if (!regexec(&regex, p, 0, NULL, 0)) {
+			if (matches_regex(cr, p)) {
 				printf("Valid-ID\n");
 			} else {
 				printf("Invalid-ID\n");
 			}
 		}
-		regfree(&regex);
 	}
 	printf("\n");
 
