@@ -14,7 +14,6 @@
 using namespace std;
 
 int v[MAX_N];
-int dp[NUM_BITS][NUM_BITS][2];
 
 int get_lower_exp(int n)
 {
