@@ -76,30 +76,36 @@ def invmod(x, p):
 
 def euclid(k, n, interval):
 	reflect = lambda x: n - x
+	flip = False
 
 	if 2 * k > n:
 		k = reflect(k)
 		interval = map(reflect, interval)
 		interval.reverse()
+		flip = True
 
 	turn = sift_intervals(interval, k)
 	if turn:
-		return turn[0]
+		result = k * turn[0]
 	else:
 		k_interval = reduce_modulo(interval, k)
 		p = k - n % k
 		q = euclid(p, k, k_interval)
-		x = mulmod(p, q, k)
-		r = mulmod(x, invmod(k, n), n)
-		d_interval = [ elem - x for elem in interval ]
-		d_interval = sift_intervals(d_interval, k)
-		return r + d_interval[0]
+		result = q + k * (interval[0] // k)
+
+	return reflect(result) if flip else result
 
 def full_euclid(interval, k, n):
 	g = gcd(k, n)
 	interval = sift_intervals(interval, g)
 	if interval:
-		return euclid(k / g, n / g, interval)
+		if interval[0] == 0:
+			return 0
+		else:
+			k /= g
+			n /= g
+			e = euclid(k, n, interval)
+			return mulmod(e, invmod(k, n), n)
 	else:
 		return None
 
@@ -128,6 +134,7 @@ def analyze(pos, paddle_speed, ball_speed, n, height):
 		for interval in intervals:
 			e = full_euclid(interval, ball_speed, mod)
 			if e is not None:
+				#e = mulmod(e, invmod(ball_speed, mod), mod)
 				if result is None or e < result:
 					result = e
 	return result
