@@ -11,8 +11,6 @@
 
 using namespace std;
 
-int h[MAX_N];
-int d[MAX_N];
 int x[MAX_N];
 int y[MAX_N];
 
@@ -39,23 +37,6 @@ T read_unsigned_integer()
 	return result;
 }
 
-template<typename T>
-T read_signed_integer()
-{
-	T result = (T) 0;
-	bool flip = false;
-	int ch = skip_whitespace();
-	if (ch == '-') {
-		flip = true;
-		ch = skip_whitespace();
-	}
-	while (ch >= '0' && ch <= '9') {
-		result = 10 * result + (ch - '0');
-		ch = getchar_unlocked();
-	}
-	return flip ? -result : result;
-}
-
 int solve_problem()
 {
 	int n;
@@ -63,13 +44,10 @@ int solve_problem()
 	n = read_unsigned_integer<int>();
 
 	for (int i = 0; i < n; i++)
-		h[i] = read_unsigned_integer<int>();
+		y[i] = read_unsigned_integer<int>();
 
 	for (int i = 0; i < n; i++)
-		d[i] = read_unsigned_integer<int>();
-
-	for (int i = 0; i < n; i++)
-		y[i] = d[i] - h[i];
+		y[i] = read_unsigned_integer<int>() - y[i];
 
 	int result = -1;
 	if (n == 1) {
