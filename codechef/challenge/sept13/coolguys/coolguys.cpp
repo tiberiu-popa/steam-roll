@@ -60,6 +60,35 @@ T gcd(T x, T y)
 	return x;
 }
 
+template<typename T>
+int get_lower_exp(T n)
+{
+	int e = 0;
+	T k = (T) 1;
+	while ((k << 1) <= n) {
+		k <<= 1;
+		++e;
+	}
+	return e;
+}
+
+int i_usqrt(int n)
+{
+	int e = get_lower_exp(n);
+	int left = 1, right = 1 << (e / 2 + 1);
+	while (left < right) {
+		int mid = left + (right - left) / 2;
+		int sqm = mid * mid;
+		if (sqm == n)
+			return mid;
+		else if (sqm < n)
+			left = mid + 1;
+		else
+			right = mid;
+	}
+	return left;
+}
+
 int solve_problem()
 {
 	int n;
@@ -67,12 +96,20 @@ int solve_problem()
 	n = read_unsigned_integer<int>();
 
 	long long x = 0;
-	for (int i = n, j = 1; i > 0;) {
-		int k = n / i;
-		x += (k - j + 1) * ((long long) i);
-		j = k + 1;
-		i = n / j;
-	}
+	int root = i_usqrt(n);
+	int invroot = n / root;
+	int min_idx = min(root - 1, invroot);
+	int max_idx = max(root - 1, invroot);
+
+	int i = 2;
+	for (; i <= min_idx; i++)
+		x += n / i;
+	x = 2 * x + n;
+	for (; i <= max_idx; i++)
+		x += n / i;
+	if (root > 1)
+		x += n - n / root * ((long long) (root - 1));
+
 	long long y = n;
 	y *= n;
 	long long g = gcd(x, y);
