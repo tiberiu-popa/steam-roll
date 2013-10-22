@@ -10,7 +10,7 @@ using namespace std;
 int a[MAX_N];
 int b[MAX_N];
 int p[MAX_N];
-double dp[MAX_N][1 << MAX_VALUE];
+pair<double, int> dp[1 << MAX_VALUE];
 
 int skip_whitespace()
 {
@@ -65,27 +65,38 @@ int solve_problem()
 
 	double result = 0.0;
 	if (n <= 16) {
-		int max_mask = pow2i(MAX_VALUE);
-		fill(dp[0], dp[0] + max_mask, 0.0);
-		dp[0][pow2i(a[0])] += (double) p[0] / 100;
-		dp[0][pow2i(b[0])] += (double) (100 - p[0]) / 100;
-
+		dp[0].first = (double) p[0] / 100;
+		dp[0].second = pow2i(a[0]);
+		dp[1].first = (double) (100 - p[0]) / 100;
+		dp[1].second = pow2i(b[0]);
 		for (int i = 1; i < n; i++) {
-			fill(dp[i], dp[i] + max_mask, 0.0);
-			double pos = (double) p[i] / 100;
-			double neg = (double) (100 - p[i]) / 100;
+			double pos_prob = (double) p[i] / 100;
+			double neg_prob = (double) (100 - p[i]) / 100;
+			int max_mask = pow2i(i);
 			int pos_mask = pow2i(a[i]);
 			int neg_mask = pow2i(b[i]);
 			for (int j = 0; j < max_mask; j++)
-				if (dp[i - 1][j] > 0.0) {
-					if ((j & pos_mask) == 0)
-						dp[i][j | pow2i(a[i])] += dp[i - 1][j] * pos;
-					if ((j & neg_mask) == 0)
-						dp[i][j | pow2i(b[i])] += dp[i - 1][j] * neg;
+				if (dp[j].second != 0) {
+					if ((dp[j].second & neg_mask) == 0) {
+						dp[max_mask + j].first = dp[j].first * neg_prob;
+						dp[max_mask + j].second = dp[j].second | neg_mask;
+					} else {
+						dp[max_mask + j].second = 0;
+					}
+					if ((dp[j].second & pos_mask) == 0) {
+						dp[j].first = dp[j].first * pos_prob;
+						dp[j].second = dp[j].second | pos_mask;
+					} else {
+						dp[j].second = 0;
+					}
+				} else {
+					dp[max_mask + j].second = 0;
 				}
 		}
-		for (int j = 0; j < max_mask; j++)
-			result += dp[n - 1][j];
+		int limit = pow2i(n);
+		for (int i = 0; i < limit; i++)
+			if (dp[i].second != 0)
+				result += dp[i].first;
 	}
 
 	printf("%lf\n", result);
