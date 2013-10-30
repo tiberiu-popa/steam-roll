@@ -27,7 +27,7 @@ int prev[MAX_N];
 int next[MAX_N];
 int current_node;
 
-vector<tree_node> tree;
+tree_node tree[(1 << 18) - 1];
 
 int skip_whitespace()
 {
@@ -93,11 +93,10 @@ void combine_nodes(tree_node &parent, const tree_node &left, const tree_node &ri
 	parent.min_health = min(left.min_health, right.min_health);
 }
 
-void build_interval_tree(vector<tree_node> &tree, int n)
+size_t build_interval_tree(tree_node *tree, int n)
 {
 	const int num_bits = get_upper_exp(n);
 	size_t tree_size = pow2s(num_bits + 1) - 1;
-	tree.resize(tree_size);
 
 	size_t offset = pow2s(num_bits) - 1;
 	for (int i = 0; i < n; i++) {
@@ -115,10 +114,11 @@ void build_interval_tree(vector<tree_node> &tree, int n)
 		tree_node &right = tree[right_index];
 		combine_nodes(parent, left, right);
 	}
+
+	return tree_size;
 }
 
-void propagate_flips(vector<tree_node> &tree, tree_node &node,
-	int left_index, int right_index, bool has_children)
+void propagate_flips(tree_node &node, int left_index, int right_index, bool has_children)
 {
 	if (node.lazy_value > 0) {
 		int lazy_value = node.lazy_value;
@@ -131,21 +131,21 @@ void propagate_flips(vector<tree_node> &tree, tree_node &node,
 	}
 }
 
-void kill_tree(vector<tree_node> &tree, int index, int start, int end)
+void kill_tree(int index, int start, int end)
 {
 	tree_node &node = tree[(size_t) index];
 	int left_index = (index << 1) + 1;
 	int right_index = left_index + 1;
 	bool has_children = (start < end);
 
-	propagate_flips(tree, node, left_index, right_index, has_children);
+	propagate_flips(node, left_index, right_index, has_children);
 	if (node.min_health > 0)
 		return;
 
 	if (has_children) {
 		int mid = start + ((end - start) >> 1);
-		kill_tree(tree, left_index, start, mid);
-		kill_tree(tree, right_index, mid + 1, end);
+		kill_tree(left_index, start, mid);
+		kill_tree(right_index, mid + 1, end);
 		combine_nodes(node, tree[(size_t) left_index], tree[(size_t) right_index]);
 	} else {
 		node.min_health = numeric_limits<int>::max();
@@ -153,38 +153,34 @@ void kill_tree(vector<tree_node> &tree, int index, int start, int end)
 	}
 }
 
-tree_node update_tree(vector<tree_node> &tree, int index, int start, int end,
-	int left, int right, int value)
+tree_node update_tree(int index, int start, int end, int left, int right, int value)
 {
 	tree_node &node = tree[(size_t) index];
 	int left_index = (index << 1) + 1;
 	int right_index = left_index + 1;
 
 	if (right < start || end < left) {
-		propagate_flips(tree, node, left_index, right_index, start < end);
+		propagate_flips(node, left_index, right_index, start < end);
 		return node;
 	}
 
 	if (left <= start && end <= right) {
 		node.lazy_value += value;
-		//*
 		if (node.min_health <= node.lazy_value)
-			kill_tree(tree, index, start, end);
+			kill_tree(index, start, end);
 		else
-		//*/
-			propagate_flips(tree, node, left_index, right_index, start < end);
+			propagate_flips(node, left_index, right_index, start < end);
 	} else {
-		propagate_flips(tree, node, left_index, right_index, true);
+		propagate_flips(node, left_index, right_index, true);
 		int mid = start + ((end - start) >> 1);
-		tree_node left_node = update_tree(tree, left_index, start, mid, left, right, value);
-		tree_node right_node = update_tree(tree, right_index, mid + 1, end, left, right, value);
+		tree_node left_node = update_tree(left_index, start, mid, left, right, value);
+		tree_node right_node = update_tree(right_index, mid + 1, end, left, right, value);
 		combine_nodes(node, left_node, right_node);
 	}
 	return node;
 }
 
-tree_node query_tree(vector<tree_node> &tree, int index, int start, int end,
-	int left, int right)
+tree_node query_tree(int index, int start, int end, int left, int right)
 {
 	tree_node best_node;
 
@@ -195,28 +191,26 @@ tree_node query_tree(vector<tree_node> &tree, int index, int start, int end,
 	int right_index = left_index + 1;
 	tree_node &parent_node = tree[(size_t) index];
 
-	propagate_flips(tree, parent_node, left_index, right_index, start < end);
+	propagate_flips(parent_node, left_index, right_index, start < end);
 
 	if (left <= start && end <= right)
 		return parent_node;
 
 	int mid = start + ((end - start) >> 1);
-	tree_node left_node = query_tree(tree, left_index, start, mid,
-		left, right);
-	tree_node right_node = query_tree(tree, right_index, mid + 1, end,
-		left, right);
+	tree_node left_node = query_tree(left_index, start, mid, left, right);
+	tree_node right_node = query_tree(right_index, mid + 1, end, left, right);
 	combine_nodes(best_node, left_node, right_node);
 	return best_node;
 }
 
-tree_node update_full_tree(vector<tree_node> &tree, int left, int right, int value)
+tree_node update_full_tree(size_t tree_size, int left, int right, int value)
 {
-	return update_tree(tree, 0, 0, tree.size() / 2, left, right, value);
+	return update_tree(0, 0, tree_size / 2, left, right, value);
 }
 
-tree_node query_full_tree(vector<tree_node> &tree, int left, int right)
+tree_node query_full_tree(size_t tree_size, int left, int right)
 {
-	return query_tree(tree, 0, 0, tree.size() / 2, left, right);
+	return query_tree(0, 0, tree_size / 2, left, right);
 }
 
 void dfs(int root)
@@ -245,7 +239,7 @@ int solve_problem()
 	current_node = 0;
 	dfs(0);
 
-	build_interval_tree(tree, n + 1);
+	size_t tree_size = build_interval_tree(tree, n + 1);
 
 	q = read_unsigned_integer<int>();
 	for (int i = 0; i < q; i++) {
@@ -256,14 +250,14 @@ int solve_problem()
 			int left = prev[a] + 1;
 			int right = next[a];
 			if (left <= right)
-				update_full_tree(tree, left, right, x);
+				update_full_tree(tree_size, left, right, x);
 		} else {
 			int a = read_unsigned_integer<int>();
 			int left = prev[a] + 1;
 			int right = next[a];
 			int result = 0;
 			if (left <= right)
-				result = query_full_tree(tree, left, right).alive;
+				result = query_full_tree(tree_size, left, right).alive;
 			printf("%d\n", result);
 		}
 	}
