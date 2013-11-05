@@ -132,7 +132,7 @@ int bit_get_prefix_max(const int *tree, const pair<int, int> *v, int idx)
 		int q = tree[idx];
 		if (max_index < 0 || v[q] > v[max_index])
 			max_index = q;
-		idx -= (idx + 1) & -(idx + 1);
+		idx = (idx & (idx + 1)) - 1;
 	}
 
 	return max_index;
@@ -142,7 +142,7 @@ int bit_get_interval_max(const int *tree, const pair<int, int> *v, int l, int r)
 {
 	int max_index = -1;
 
-	for (int idx = r - ((r + 1) & -(r + 1)); l <= r; r = idx, idx -= (idx + 1) & -(idx + 1)) {
+	for (int idx = (r & (r + 1)) - 1; l <= r; r = idx, idx = (idx & (idx + 1)) - 1) {
 		int q;
 		if (idx + 1 >= l) {
 			q = tree[r];
@@ -178,11 +178,11 @@ int bit_get_element(int idx)
 int bit_set_element(int *tree, pair<int, int> *v, int tree_size, int idx, pair<int, int> value)
 {
 	v[idx] = value;
-	for (int x = idx; x < tree_size; x += (x + 1) & -(x + 1)) {
+	for (int x = idx; x < tree_size; x |= (x + 1)) {
 		if (v[tree[x]] == v[idx]) {
 			int z = -1;
 			if (x > 0) {
-				int left = x - ((x + 1) & -(x + 1)) + 1;
+				int left = x & (x + 1);
 				int right = x - 1;
 				if (left <= right)
 					z = bit_get_interval_max(tree, v, left, right) ;
@@ -393,7 +393,7 @@ int solve_problem()
 		int chain = chain_index[i];
 		int chpos = chain_position[i];
 		int pos = tree_offsets[chain] + chpos;
-		tree[0][pos] = chpos - ((chpos + 1) & -(chpos + 1)) + 1;
+		tree[0][pos] = chpos & (chpos + 1);
 		v[0][pos] = pair<int, int>(-pos - n, i);
 		tree[1][pos] = chpos;
 		v[1][pos] = pair<int, int>(pos - n, i);
