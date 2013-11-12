@@ -154,10 +154,7 @@ int solve_problem(int n, int m)
 	} else {
 		int total_sources = num_sources + num_both;
 		int total_sinks = num_sinks + num_both;
-		if (total_sources > 1)
-			return min(total_sources, total_sinks);
-		else
-			return total_sinks;
+		return max(total_sources, total_sinks);
 	}
 }
 
