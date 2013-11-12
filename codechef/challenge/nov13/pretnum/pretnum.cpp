@@ -169,7 +169,7 @@ void build_primes(int limit)
 	int sqlim = i_lsqrt(limit);
 
 	primes.push_back(2);
-	fill(prime + 2, prime + limit - 1, true);
+	fill(prime + 2, prime + limit + 1, true);
 	for (int j = 4; j <= limit; j += 2)
 		prime[j] = false;
 
