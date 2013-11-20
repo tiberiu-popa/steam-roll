@@ -76,12 +76,7 @@ int get_msb(size_t n)
 
 int get_upper_exp(size_t n)
 {
-	int k = get_msb(n);
-	size_t result = pow2(k - 1);
-	if (result == n)
-		return k - 1;
-	else
-		return k;
+	return get_msb(n - 1);
 }
 
 void build_interval_tree(vector<int> &tree, const vector<int> &chains)
