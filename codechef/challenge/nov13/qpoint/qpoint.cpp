@@ -82,13 +82,6 @@ void tree_bfs(const vector<int> *neighbours, int root, vector<int> &nodes)
 }
 
 template<typename T>
-T pow2(int k)
-{
-	T result = 1;
-	return result << k;
-}
-
-template<typename T>
 int get_msb(T n)
 {
 	int k = 0;
@@ -100,12 +93,7 @@ int get_msb(T n)
 template<typename T>
 int get_upper_exp(T n)
 {
-	int k = get_msb(n);
-	T result = pow2<T>(k - 1);
-	if (result == n)
-		return k - 1;
-	else
-		return k;
+	return get_msb(n - 1);
 }
 
 long long ll_mul(long long x, long long y)

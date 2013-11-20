@@ -6,7 +6,6 @@
 
 #define MAX_N 100001
 
-#define pow2i(x) (1 << (x))
 #define pow2s(x) (((size_t) 1) << (x))
 
 using namespace std;
@@ -79,12 +78,7 @@ int get_msb(int n)
 
 int get_upper_exp(int n)
 {
-	int k = get_msb(n);
-	int result = pow2i(k - 1);
-	if (result == n)
-		return k - 1;
-	else
-		return k;
+	return get_msb(n - 1);
 }
 
 void combine_nodes(tree_node &parent, const tree_node &left, const tree_node &right)
