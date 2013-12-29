@@ -63,69 +63,6 @@ char read_character()
 }
 
 template<typename T>
-int get_msb(T n)
-{
-	int k = 0;
-	for (; n > 0; n >>= 1)
-		k++;
-	return k;
-}
-
-template<typename T>
-int get_lower_exp(T n)
-{
-	return get_msb(n >> 1);
-}
-
-template<typename T>
-int get_upper_exp(T n)
-{
-	return get_msb(n - 1);
-}
-
-template<typename T>
-T i_lsqrt(T n)
-{
-	int e = get_lower_exp(n);
-	T left = 1, right = ((T) 1) << (e / 2 + 1);
-	while (left < right) {
-		T mid = left + (right - left + 1) / 2;
-		T sqm = mid * mid;
-		if (sqm == n)
-			return mid;
-		else if (sqm < n)
-			left = mid;
-		else
-			right = mid - 1;
-	}
-	return left;
-}
-
-int addsmallmod(int x, int y, int p)
-{
-	int sum = x;
-	sum += y;
-	if (sum >= p)
-		sum -= p;
-	return sum;
-}
-
-void extract_digits(int n, vector<int> &digits)
-{
-	digits.clear();
-	for (; n > 0; n /= 10)
-		digits.push_back(n % 10);
-}
-
-int get_num_digits(int n)
-{
-	int num_digits = 0;
-	for (; n > 0; n /= 10)
-		++num_digits;
-	return num_digits;
-}
-
-template<typename T>
 bool leq_pair(pair<T, T> elem)
 {
 	return elem.first <= elem.second;
