@@ -1,0 +1,216 @@
+||| Design Uber backend |||
+
+============
+Capacity
+============
+
+- 100M customers, 1M drivers
+- 1M DAC, 300K DAD
+- 1M daily rides
+- notify nearby customers of driver location every 5s
+- 100M notifications/day
+- real-time connection between customer and driver
+
+
+||| Design Dropbox |||
+
+============
+Capacity
+============
+
+- 500M customers, 100M DAU
+- 2 devices/user
+- 200 files/user, 100KB/file, 20MB/user
+- total storage: 10PB
+- connections: 10/user/day, total 1B/day
+
+
+||| Design Facebook Messenger |||
+
+============
+Capacity
+============
+
+- 1B DAU
+- each user: 50 messages/day
+- 50B messages/day
+- avg 100 bytes/message, so 5TB/day
+- 5 years: 9.1PB (1825 days in 5 years)
+- bandwidth: 5TB/86400 = 57MB/s
+
+
+||| Design Yelp or Nearby Friends |||
+
+============
+Capacity
+============
+
+- 1B places
+- 100M DAU
+- each user: 10 search/day
+- 1B searches/day, 11.5K qps
+- 20% growth every year
+
+
+||| Design TinyURL |||
+
+============
+Capacity
+============
+
+- 1B shortened URLs per month, 385 qps
+- read v write: 100x
+- 60B URLs in 5 yrs
+- 1K bytes/URL, total 60 TB
+- write 385KB/s, read 38MB/s
+- 80/20 rule
+- cache 20% of 38MB * 86400s, i.e. 656GB
+
+
+||| Design Instagram |||
+
+============
+Capacity
+============
+
+- 1B total users, 300M DAU
+- 2 devices per user
+- each user 2 posts/day
+- each photo 1MB
+- total storage: 600M photos x 1MB = 600TB
+- 5 yrs: 1095PB
+
+
+||| Design Twitter |||
+
+============
+Capacity
+============
+
+- 500M total users, 200M DAU
+- 100M tweets/day
+- 100 follows/user, 50B follows
+- 10 likes/day, 2B total
+- 5 feed views, 20 posts/view, 20B tweets/day
+- tweet storage: 350 bytes/tweet, 35GB/day
+- photo storage: 10% posts have photo of 1MB - 10TB/day
+- video storage: 5% posts have video of 5MB - 25TB/day
+- total: 35TB/day
+- write bandwidth: 35/86400 = 405 MB/s
+- read bandwidth: 20B is 200x writes, 80 GB/s
+
+
+||| Design Pastebin |||
+
+============
+Capacity
+============
+
+- 100M total users, 50M DAU
+- 10% paste rate, 5M/day
+- read:write 10x
+- max payload 50KB
+- total storage: 5Mx50KB = 250GB/day
+- 5 yrs: 250GBx2000 = 500TB
+
+
+||| Design Typeahead Suggestion |||
+
+============
+Capacity
+============
+
+- let's assume use case is Google search
+- 10B searches/day
+- call typeahead 5 times/search
+- 50B calls/day
+- average length: 8 words or 50 characters
+- nodes: 400B or 2.5T
+- index: 20B pages
+
+
+||| Design Twitter Search |||
+
+============
+Capacity
+============
+
+- 200M users, 100M DAU
+- 100M tweets/day
+- each user 5 searches/day
+- 500M searches/day
+- storage: 100M x 400 bytes = 400GB/day
+
+
+||| Design Web Crawler |||
+
+============
+Capacity
+============
+
+- 20B pages in one month
+- 200KB/page
+- total 200KB x 20B = 4PB
+
+
+||| Design API Rate Limiter |||
+
+============
+Capacity
+============
+
+- let's assume use case is Facebook
+- 1B users, 500M DAU
+- 2B posts/day
+- 5B API calls/day
+- 81K calls/sec
+- keys: 500M (num users)
+- entry per key: user + timestamp list (10 elements), 50 bytes
+- storage: 500M x 50 bytes = 25GB
+
+
+||| Design Ticketmaster |||
+
+============
+Capacity
+============
+
+- 10K cinemas, 10M customers, 5M DAU
+- 1000 seats/cinema, total 10M seats
+- 1 ticket/day, total 5M tickets/day
+- 5 shows/day
+- 10K x 1000 x 5 = 50M bookings/day
+- entry per booking: ID + show + movie + list<seat> + status + timestamp (50 bytes)
+- storage: 2.5GB/day
+- 5 yrs: 4.5TB
+
+
+||| Design Facebook Newsfeed |||
+
+============
+Capacity
+============
+
+- 1B users, 500M DAU
+- each user has 300 friends, follows 200 pages
+- fetch feed 10 times/day, 5B/day, 57K/s
+- store last 500 posts in memory
+- 1KB/post, 500KB/user, 250T
+
+
+||| Design Youtube/Netflix |||
+
+============
+Capacity
+============
+
+- 1B users, 500M DAU
+- avg user 10 videos/day, 5B/day, 57K/day
+- read:write 100x
+- upload 570 videos/sec
+- 5 minutes/video, 2850 minutes of video / sec
+- 10 MB/minute of video, 28.5GB/s (upload bandwidth)
+- store videos in 5 formats
+- storage: 5 x 28.5 = 142GB/s
+- read: 2.85TB/s
+

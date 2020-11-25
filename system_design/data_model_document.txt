@@ -1,0 +1,189 @@
+||| Design TinyURL |||
+
+============
+Data Model
+============
+
+- URL table: url_hash, original_url, creator_id, creation_date, expiration_time
+- User table: user_id, user_name, account_creation_date, email, last_login
+
+
+||| Design Facebook Newsfeed |||
+
+============
+Data Model
+============
+
+- User table: user_id, user_name, account_creation_date, email, last_login
+- Entity (page & group) table: entity_id, entity_name, description, creation_date
+- Post table: post_id, creator_id, owner_id (entity), post_text, media_id, creation_date, num_likes
+- Media (photo & video) table: media_id, creator_id, creation_date, file_handle
+- Followers table: follower_id, followee_id
+
+
+||| Design Facebook Messenger |||
+
+============
+Data Model
+============
+
+- very high rate of small updates
+- can't update SQL or NoSQL like MongoDB every time a user sends a message
+- use wide-column database HBase
+- stores new data in memory buffer, then dumps to disk
+- efficient DB to store variably sized data
+
+
+||| Design Youtube/Netflix |||
+
+============
+Data Model
+============
+
+- User table: user_id, user_name, creation_date, email, age
+- Video table: video_id, creator_id, title, description, thumbnail
+- Comment table: comment_id, commenter_id, video_id, comment_text, creation_date
+
+
+||| Design Instagram |||
+
+============
+Data Model
+============
+
+- User table: user_id, user_name, creation_date, email, age, last_login
+- Follow table: follower_id, followee_id
+- Photo table: photo_id, creator_id, creation_date, caption_text, location, photo_handle
+- can use MySQL since joins are required (issues when scaling)
+- S3 for distributed file storage (photos)
+- distributed key-value store: photo_id to metadata (creation_date, location)
+- wide-column datastore like Cassandra
+  - user_id to list of photo_ids
+  - follower_id to list of followee_ids
+- maintain replicas for reliability (Cassandra)
+
+
+||| Design Yelp or Nearby Friends |||
+
+============
+Data Model
+============
+
+- Location table: location_id, location_name, lat/long, description, category (restaurant, theater)
+- Reviews table: review_id, location_id, reviewer_info, review_text, rating
+
+
+||| Design Uber backend |||
+
+============
+Data Model
+============
+
+- quad tree to store drivers available in a given location (in memory)
+- current and previous location of driver stored in distributed hash table
+
+
+||| Design API Rate Limiter |||
+
+============
+Data Model
+============
+
+- in-memory key value database
+- from user_id to {count: int, epoch_time: int}
+- set hash to expire one hour later
+
+
+||| Design Ticketmaster |||
+
+============
+Data Model
+============
+
+- City table: city_id, city_name, lat/long, zip_code
+- Cinema table: cinema_id, cinema_name, address, city_id
+- Hall table: hall_id, cinema_id, num_seats
+- Seat table: seat_id, seat_number, hall_id
+- Movie table: movie_id, movie_name, description, duration, release_date, cast
+- Show table: show_id, hall_id, movie_id, start_date, end_date
+- ShowSeat table: booking_id, show_id, seat_id, price, status (RESERVED|BOOKED)
+- Booking table: show_id, user_id, booking_date, num_seats
+- User table: user_id, user_name, email, age
+- Payment table: transaction_id, booking_id, payment_date, payment_method, amount
+
+
+||| Design Dropbox |||
+
+============
+Data Model
+============
+
+- metadata: file name, size, shared with, modification date, chunks
+- ACID is needed, so either SQL or NoSQL with programmatic ACID support
+- tables: files, chunks, users, devices, workspaces (sync folders)
+- File table: file_id, file_name, uploader_id, file_hash, num_chunks
+- Chunk table: chunk_id, chunk_path, file_id
+- Share table: file_id, sharee_id, permissions
+- User table: user_id, user_name, email, creation_date, age
+- Device table: device_id, user_id, device_type
+- Workspace table: workspace_id, device_id, sync_settings
+
+
+||| Design Typeahead Suggestion |||
+
+============
+Data Model
+============
+
+- trie stored in memory
+- periodically back snapshot of trie in a file
+
+
+||| Design Twitter |||
+
+============
+Data Model
+============
+
+- User table: user_id, user_name, location, creation_date, email, age, last_login
+- Tweet table: tweet_id, tweet_text, tweet_location, creation_date, num_likes
+- Follow table: follower_id, followee_id
+- Like table: liker_id, post_id
+
+
+||| Design Web Crawler |||
+
+============
+Data Model
+============
+
+- each crawler host stores its part of the URL frontier
+- each crawler host also stores all checksums (both for URL dedupe and document dedupe)
+- if the actual documents need to be stored, we can do so separately in blob storage (Amazon S3)
+
+
+||| Design Twitter Search |||
+
+============
+Data Model
+============
+
+- Tweet table: tweet_id, tweet_text
+  - partitioned on hash(tweet_id)
+  - extra copy of all tweets for fault tolerance
+- Tweet index: from word to list<tweet_id>
+  - 500K words
+  - big distributed hash table
+  - hundreds of server needed to keep hash table in memory
+  - shard either on words (hot word? imbalanced distribution?) or on tweet_id (aggregation?)
+
+
+||| Design Pastebin |||
+
+============
+Data Model
+============
+
+- Paste table: paste_hash, paste_content, user_id, creation_date, expiration_time
+- User table: user_id, user_name, email, creation_date, age, last_login
+

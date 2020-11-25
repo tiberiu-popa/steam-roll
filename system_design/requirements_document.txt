@@ -1,0 +1,269 @@
+||| Design Uber backend |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- actors: drivers and customers (and banks)
+- drivers notify location and availability
+- customers can see nearby drivers
+- request a trip from current location to destination
+- nearby drivers are notified and can choose to take the trip
+- see each other's location
+- end of ride: driver marks as done, becomes available
+
+Non-functional Requirements:
+- high availability
+- real-time experience with minimum latency
+- handle large spikes for events
+
+
+||| Design API Rate Limiter |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- limit number of requests within a given time window
+- works both on a single server and on a combination of servers
+
+Non-functional Requirements:
+- high availability: protects website
+- low latency: good user experience
+
+
+||| Design Ticketmaster |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- select city, movie/cinema, time, seats (booked vs unbooked)
+- reserve seats for 5 minutes
+- make payment to finalize booking
+- wait until seats are available
+- waiting customers should be serviced in a fair, first come first served manner
+
+Non-functional Requirements:
+- consistency for bookings and financial transactions (ACID)
+- highly concurrent: handle simultaneous bookings gracefully and fairly
+
+
+||| Design Typeahead Suggestion |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- enter partial query, make 5-10 suggestions
+
+Non-functional Requirements:
+- high availability: save time of users using best effort suggestions
+- latency: at most 100ms
+
+
+||| Design Youtube/Netflix |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- upload video in different formats, add metadata
+- search video by title/description
+- stream video
+- video stats (likes/views)
+- comment on videos
+
+Non-functional Requirements:
+- highly available
+- eventual consistency
+- reliable: don't lose videos
+- real-time video streaming
+
+
+||| Design Instagram |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- follow users
+- upload photos with caption
+- load feed
+- search photos based on caption
+
+Non-functional Requirements:
+- highly available: always want to see feed
+- eventual consistency
+- latency: 200ms for feed generation
+- highly reliable: never lose a photo
+
+
+||| Design Facebook Messenger |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- see friends in messenger list
+- 1 account, multiple devices
+- 1:1 chats
+- checks (sent, received, seen)
+- last seen at
+- search messages
+- extra: group chats
+
+Non-functional Requirements:
+- consistent order of messages
+- high availability is desirable
+- durability: don't lose messages
+- minimum latency: real-time chat experience
+
+
+||| Design Web Crawler |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- crawl all web pages
+- generate new links from existing pages
+- re-crawl existing pages
+
+Non-functional Requirements:
+- scalable: > 100M documents
+- extensible: modular design
+
+
+||| Design Yelp or Nearby Friends |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- actors: customer, business owner
+- place management (add/update/delete)
+- search nearby places (lat, long, radius)
+- reviews
+
+Non-functional Requirements:
+- min latency: real-time search experience
+- support heavy search load
+
+
+||| Design Twitter Search |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- search query using syntax (AND/OR/quotes etc.)
+
+Non-functional Requirements:
+- min latency
+- highly available
+- support heavy search load
+
+
+||| Design Dropbox |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- upload and download files
+- share files and folders with other users
+- clients for both desktop and mobile
+- desktop synchronization, handle conflicts
+- offline editing
+- large files (many GB)
+
+Non-functional Requirements:
+- durability: don't lose files
+- consistency: once files are added/updated/removed, everybody should see them
+- ACID
+
+
+||| Design TinyURL |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- get short link for long url
+- redirect to original link
+- ability to choose custom links
+- expire links
+- analytics, REST API
+
+Non-functional Requirements:
+- highly available (otherwise redirections will start failing)
+- min latency
+- unpredictable links
+
+
+||| Design Facebook Newsfeed |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- users can see most recent posts of their friends and of followed pages
+- posts: text and media (photo/video)
+- append new posts to feed as they arrive
+
+Non-functional Requirements:
+- highly available
+- eventual consistency
+- latency: feed generation max 2s, feed update for new posts max 5s
+
+
+||| Design Pastebin |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- upload text and get back link that can be shared
+- custom short links
+- expiration time for data and links
+- analytics, REST API
+
+Non-functional Requirements:
+- highly available
+- highly reliable or durability: don't lose pastes
+- access pastes with minimum latency
+- unpredictable links
+
+
+||| Design Twitter |||
+
+============
+Requirements
+============
+
+Functional Requirements:
+- user can register, follow other users, post text with photos/videos
+- like/retweet/reply functionality
+- generate feed from followed users
+- other: search tweets, trending topics, tagging users, notification, PYMK, moments
+
+Non-functional Requirements:
+- highly available
+- eventual consistency
+- latency: 200ms for feed generation
+

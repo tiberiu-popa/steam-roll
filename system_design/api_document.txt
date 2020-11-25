@@ -1,0 +1,160 @@
+||| Design Youtube/Netflix |||
+
+============
+API
+============
+
+- uploadVideo(api_key, title, description, tags, location, video_contents)
+- searchVideo(api_key, query, location, num_videos, page_no)
+- streamVideo(api_key, video_id, offset, codec/resolution)
+
+
+||| Design Dropbox |||
+
+============
+API
+============
+
+- uploadFile
+- downloadFile
+- shareWith
+- generateLink
+- synchronizeFile (or synchronizeFolder)
+
+
+||| Design API Rate Limiter |||
+
+============
+API
+============
+
+- checkRateLimit(key, timestamp): bool
+
+
+||| Design Yelp or Nearby Friends |||
+
+============
+API
+============
+
+- search(api_key, query, location_rectangle, num_results, page_no)
+  - optional
+    - category: restaurant, shopping center
+    - sort: best matched, min distance, highest rated
+
+
+||| Design Facebook Newsfeed |||
+
+============
+API
+============
+
+- generateFeed(api_key, user_id, num_results, max_timestamp): [feed items]
+
+
+||| Design Ticketmaster |||
+
+============
+API
+============
+
+- searchMovies(api_key, query, location, time_period, spellcheck, num_results, page_no, sorting_order): list<(movies, shows)>
+  - sorting order: name,asc date,desc etc.
+- reserveSeats(api_key, cinema, auditorium, movie, show, list<seat>): status
+
+
+||| Design Uber backend |||
+
+============
+API
+============
+
+- search(api_key, location_rectangle, num_results, page_no)
+- notify(api_key, location)
+
+
+||| Design Facebook Messenger |||
+
+============
+API
+============
+
+- sendMessage(api_key, destination, message): messageID
+- notify(api_key, status, messageID)
+- createGroup(api_key, list<user>)
+
+
+||| Design Twitter Search |||
+
+============
+API
+============
+
+- search(api_key, query, location, num_results, page_no, sort)
+  - sort: latest first, best matched, most liked
+
+
+||| Design Twitter |||
+
+============
+API
+============
+
+- tweet(api_key, text, list<media>, location): post_url
+- genFeed(api_key, user_id, num_results, max_timestamp)
+
+
+||| Design Typeahead Suggestion |||
+
+============
+API
+============
+
+- typeahead(api_key, query, num_suggestions): list<suggestion>
+
+
+||| Design Instagram |||
+
+============
+API
+============
+
+- makePost(api_key, text, list<media>, location)
+- searchPosts(api_key, query, num_results, page_no)
+- followUser(api_key, followee)
+- genFeed(api_key, user_id, num_results, max_timestamp)
+
+
+||| Design Pastebin |||
+
+============
+API
+============
+
+- makePaste(api_key, text, ?custom_url, ?expiration_date): paste_url or paste_id
+- getPaste(api_key, paste_id)
+- deletePaste(api_key, paste_id)
+
+
+||| Design TinyURL |||
+
+============
+API
+============
+
+- createShortLink(api_key, long_url, ?custom_url, ?expiration_date): short_url
+- deleteShortLink(api_key, short_url)
+- redirect(api_key, short_url): long_url
+
+
+||| Design Web Crawler |||
+
+============
+API
+============
+
+- enqueueURL(api_key, page_url)
+- lastFetched(api_key, page_url): ?timestamp
+- fetchURL(api_key, page_url): document
+- processDocument(api_key, document): ?list<link>
+
